@@ -1,17 +1,18 @@
 from import_modules import *
 
 class GlaubenDataPrep:
-  def __init__(self, mode, data_dir):
-    self.mode = mode
+  def __init__(self, data_dir):
     self.data_dir = data_dir # C:/Users/ignac/downloads/test.csv
     self.filename = data_dir.split('/')[-1] #TODO: implementar algo con OS
+    self.data = None
+    self.clean_data = None
 
   def loadData(self):
     """
       Función destinada a cargar los datos almacenados en el directorio data_dir.
     """
-    data = pd.read_csv(self.data_dir)
-    return data
+    self.data = pd.read_csv(self.data_dir)
+    return
 
   def filterByGauss(self, df_data_orig: pd.DataFrame, n_desv_est: int):
     """
@@ -26,8 +27,9 @@ class GlaubenDataPrep:
       Retorna:
         - result_df: objeto de tipo pd.DataFrame que posee los datos "limpios".
     """
-    str_colums = ["Timestamp", "Month", "Day"]
-    df_columns = [i for i in df_data_orig.columns.tolist() if i not in str_colums]
+    orig_cols = df_data_orig.columns.tolist()
+    str_colums = ["Timestamp", "Month", "Day", "Tipo Operacion", "Nombre planta"]
+    df_columns = [i for i in orig_cols if i not in str_colums]
     result_df = df_data_orig.copy(deep=True)
 
     for col in df_columns:
