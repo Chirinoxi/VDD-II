@@ -1,4 +1,4 @@
-from import_modules import *
+from src.import_modules import *
 
 class GlaubenDataVisualization:
   def __init__(self, mode, data):
@@ -6,4 +6,5 @@ class GlaubenDataVisualization:
     self.data = data
   
   def plotWithScatter(self, numb_of_series):
+
     return
