@@ -1,4 +1,4 @@
-from import_modules import *
+from src.import_modules import *
 
 class GlaubenDataModeling:
   def __init__(self, mode):

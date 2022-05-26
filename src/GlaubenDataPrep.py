@@ -1,4 +1,4 @@
-from import_modules import *
+from src.import_modules import *
 
 class GlaubenDataPrep:
   def __init__(self, data_dir):
