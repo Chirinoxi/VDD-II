@@ -48,7 +48,7 @@ class GlaubenDataVisualization:
                       en el caso dejar en blanco, se graficarán todas las columnas del dataframe.
 
         """
-        
+
         if self.mode == "plotly":
             if type(y_name) == list:
                 if len(y_name) == 0:
@@ -62,28 +62,38 @@ class GlaubenDataVisualization:
                     nombre_columna = y_name[i]
                     cantidad = self.data[nombre_columna].notnull().sum()
                     count_data.append(cantidad)
-                fig = px.bar(x=y_name, y=count_data, width=1200, height=600, title=("Cantidad no nulos de " + str(', '.join(y_name))+"."), color= y_name)
+                fig = px.bar(x=y_name, y=count_data, width=1200, height=600, title=(
+                    "Cantidad no nulos de " + str(', '.join(y_name))+"."), color=y_name)
             else:
                 all_data = False
                 cantidad = self.data[y_name].notnull().sum()
                 nombres = [y_name]
                 cantidades = [cantidad]
-                fig = px.bar(x=nombres, y=cantidades, width=1200, height=600, title=("Cantidad no nulos de" + y_name+"."))
+                fig = px.bar(x=nombres, y=cantidades, width=1200, height=600, title=(
+                    "Cantidad no nulos de" + y_name+"."))
 
             if all_data:
-                fig.update_layout(title="Cantidad de datos no nulos por columna", title_x=0.5, width=1200, height=800)
+                fig.update_layout(title="Cantidad de datos no nulos por columna",
+                                  title_x=0.5, width=1200, height=800, title_font={"size": 25})
                 fig.update_xaxes(
                     tickangle=315,
                     title_font={"size": 20},
-                    title_standoff=25
+                    title_standoff=25,
+                    title_text='Columnas'
                 )
             else:
-                fig.update_layout(title_x=0.5)
+                fig.update_layout(title_x=0.5, title_font={"size": 25})
                 fig.update_xaxes(
                     tickangle=0,
                     title_font={"size": 20},
-                    title_standoff=25
+                    title_standoff=25,
+                    title_text='Columnas',
                 )
+            fig.update_yaxes(
+                title_font={"size": 20},
+                title_standoff=25,
+                title_text='Cantidades'
+            )
             fig.update_traces(showlegend=False)
             fig.show()
 
@@ -118,5 +128,3 @@ class GlaubenDataVisualization:
                 'yanchor': 'top'})
         fig.show()
         return
-
-    
