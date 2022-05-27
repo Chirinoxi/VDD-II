@@ -44,8 +44,8 @@ class GlaubenDataVisualization:
           donde los datos del eje y pueden ser de un array, dataframe, etc. y múltiples de ellos.
 
           Parámetros
-            - x_name: objeto de tipo pd.DataFrame que posee los datos a graficar en el eje x.
-            - y_name: objeto de tipo pd.DataFrame que posee los datos a graficar en el eje y.
+            - y_name: objeto de tipo pd.DataFrame que posee los datos a graficar en el eje y, estos datos serán contados y desplegados en el gráfico.
+                      en el caso dejar en blanco, se graficarán todas las columnas del dataframe.
 
         """
         
@@ -54,18 +54,24 @@ class GlaubenDataVisualization:
                 if len(y_name) == 0:
                     all_data = True
                     y_name = self.data.columns.tolist()
+                else:
+                    all_data = False
                 count_data = []
                 x_ticks = np.arange(len(y_name))
                 for i in range(len(y_name)):
                     nombre_columna = y_name[i]
                     cantidad = self.data[nombre_columna].notnull().sum()
                     count_data.append(cantidad)
-                fig = px.bar(x=y_name, y=count_data, width=1200, height=600, title=("Cantidad de " + str(', '.join(y_name))+"."))
+                fig = px.bar(x=y_name, y=count_data, width=1200, height=600, title=("Cantidad no nulos de " + str(', '.join(y_name))+"."), color= y_name)
             else:
-                #fig = px.bar(self.data, x=x_ticks, y=y_name, width=1200, height=600, title=("Cantidad de" + y_name+"."))
-                print()
+                all_data = False
+                cantidad = self.data[y_name].notnull().sum()
+                nombres = [y_name]
+                cantidades = [cantidad]
+                fig = px.bar(x=nombres, y=cantidades, width=1200, height=600, title=("Cantidad no nulos de" + y_name+"."))
+
             if all_data:
-                fig.update_layout(title_x=0.5, title="Cantidad de datos no nulos por columna", width=1200, height=800)
+                fig.update_layout(title="Cantidad de datos no nulos por columna", title_x=0.5, width=1200, height=800)
                 fig.update_xaxes(
                     tickangle=315,
                     title_font={"size": 20},
@@ -74,10 +80,11 @@ class GlaubenDataVisualization:
             else:
                 fig.update_layout(title_x=0.5)
                 fig.update_xaxes(
-                    tickangle=315,
+                    tickangle=0,
                     title_font={"size": 20},
                     title_standoff=25
                 )
+            fig.update_traces(showlegend=False)
             fig.show()
 
         elif self.mode == "mpl":
