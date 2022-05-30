@@ -16,8 +16,8 @@ df_original = pd.DataFrame([])
 
 H1_STYLE = { 
             "width": "90vw",
-            "margin": "1.5rem 1.5rem",
-            "padding": "auto",
+            "margin": "1.5rem auto",
+            "padding": "2px 0",
             "text-align": "center"
             }
 
@@ -28,7 +28,7 @@ BUTTON_STYLE = {
 CENTERING = {
     "width": "600px",
     "margin": "1.5rem auto",
-    "padding": "50px 0",
+    "padding": "5px 0",
     "text-align": "center"
 }
 
