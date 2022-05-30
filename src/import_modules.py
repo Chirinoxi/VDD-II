@@ -26,4 +26,4 @@ from tensorflow.keras.layers import Dense, BatchNormalization,\
 from tensorflow.keras.regularizers import l1, l2, l1_l2
 from tensorflow.keras.optimizers import Adam, Adagrad, Adamax, Adadelta, SGD, RMSprop
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-import keras_tuner as kt
+# import keras_tuner as kt

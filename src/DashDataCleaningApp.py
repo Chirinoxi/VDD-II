@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import dash_bootstrap_components as dbc
 
+from GlaubenDataPrep import GlaubenDataPrep
 
 from dash_extensions.snippets import send_bytes
 from dash import Dash, Input, Output, State, dcc, html, dash_table
@@ -38,11 +39,20 @@ TABLE_STYLE = {
 # Variables SDI
 
 important_features = ['Timestamp', 'Day', 'Flujo de rechazo', 'Temperatura entrada', 
-                 'Conductividad de permeado', 'Presion de entrada', 'SDI Entrada RO']
+                    'Conductividad de permeado', 'Presion de entrada', 'SDI Entrada RO']
+
+# -------------------------- Archivos de datos -----------------------
+
+df_raw_data = pd.DataFrame(columns = [])
+df_clean_data = pd.DataFrame(columns = [])
+
+data_dir = ''
+glauben_data_prep = GlaubenDataPrep(data_dir)
+
+# --------------------------------- ° ---------------------------------
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets)
-# app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.title = "Demo limpieza"
 app.layout = html.Div([
@@ -69,14 +79,19 @@ app.layout = html.Div([
 
     html.Hr(),
     html.Div([
-        html.Button('Generar limpieza', style=BUTTON_STYLE)
-        ], id="clean-data-container", style=CENTERING)
+        html.Button('Generar limpieza', style=BUTTON_STYLE, id="clean-data-button"),
+        dcc.Download(id="download-cleaned-data"),
+        ], id="clean-data-container", style=CENTERING),
+
+    # Elemento para compartir datos entra callbacks (evitar utilizar variables globales).
+    dcc.Store(id='intermediate-value')
 ])
 
 def parse_data(contents, filename):
     try:
         content_type, content_string = contents.split(",")
         decoded = base64.b64decode(content_string)
+        print("content_type:", content_type)
         if "csv" in filename:
             # Assume that the user uploaded a CSV or TXT file
             df = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
@@ -94,20 +109,36 @@ def parse_data(contents, filename):
 @app.callback(
     Output("raw-data-table", "data"), 
     Output("raw-data-table", "columns"),
+    Output('intermediate-value', 'data'),
     [Input("upload-button", "contents"), State("upload-button", "filename")],
 )
 def update_table(contents, filename):
     data, df_columns = [], []
+    df_raw_data = pd.DataFrame([])
     if contents != None and filename != None:
         try:
-            df_data = parse_data(contents, filename)
-            df_data = df_data.iloc[:15, :][important_features]
+            df_raw_data = parse_data(contents, filename)
+            df_data = df_raw_data.copy(deep=True).iloc[:15, :][:10]
             data = df_data.to_dict('records')
             df_columns = [{'name': i, 'id': i} for i in df_data.columns]
-            print("df_columns:", df_columns)
         except Exception as e:
             print("e:", e)
-    return (data, df_columns)
+    return (data, df_columns, df_raw_data.to_json(orient='split'))
+
+@app.callback(
+    Output("download-cleaned-data", "data"),
+    [Input("clean-data-button", "n_clicks"),
+     Input("intermediate-value", "data")],
+    prevent_initial_call=True,
+)
+def clean_data(n_clicks, json_data):
+    print("n_clicks:", n_clicks)
+    if n_clicks != None:
+        df_data = pd.read_json(json_data, orient='split')
+        df_clean_data = glauben_data_prep.filterByGauss(df_data, n_desv_est=3)
+        dictionary = dcc.send_data_frame(df_clean_data.to_csv, "Datos-Limpios.csv")
+        return dictionary
+    return
 
 if __name__ == '__main__':
     app.run_server(debug=True)
