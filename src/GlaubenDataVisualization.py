@@ -37,6 +37,7 @@ class GlaubenDataVisualization:
         'yanchor': 'top'})
     fig.show()
     return
+
   def plotWithBox(self, x_name, y_name, t_title):
     df=self.data
     fig = px.box(df,x = x_name,y = y_name, title=t_title)
