@@ -12,6 +12,8 @@ from GlaubenDataPrep import GlaubenDataPrep
 from dash_extensions.snippets import send_bytes
 from dash import Dash, Input, Output, State, dcc, html, dash_table
 
+df_original = pd.DataFrame([])
+
 H1_STYLE = { 
             "width": "90vw",
             "margin": "1.5rem 1.5rem",
@@ -21,14 +23,13 @@ H1_STYLE = {
 
 BUTTON_STYLE = { 
                 "position": "relative",
-                "margin": "auto",
-                "float" : "center"
                 }
 
 CENTERING = {
-    "width": "300px",
+    "width": "600px",
     "margin": "1.5rem auto",
-    "padding": "0",
+    "padding": "50px 0",
+    "text-align": "center"
 }
 
 TABLE_STYLE = {
@@ -84,7 +85,7 @@ app.layout = html.Div([
         ], id="clean-data-container", style=CENTERING),
 
     # Elemento para compartir datos entra callbacks (evitar utilizar variables globales).
-    dcc.Store(id='intermediate-value')
+    dcc.Store(id='original-data-file')
 ])
 
 def parse_data(contents, filename):
@@ -109,7 +110,7 @@ def parse_data(contents, filename):
 @app.callback(
     Output("raw-data-table", "data"), 
     Output("raw-data-table", "columns"),
-    Output('intermediate-value', 'data'),
+    Output("original-data-file", "data"),
     [Input("upload-button", "contents"), State("upload-button", "filename")],
 )
 def update_table(contents, filename):
@@ -118,7 +119,7 @@ def update_table(contents, filename):
     if contents != None and filename != None:
         try:
             df_raw_data = parse_data(contents, filename)
-            df_data = df_raw_data.copy(deep=True).iloc[:15, :][:10]
+            df_data = df_raw_data.copy(deep=True).iloc[:15, :][:6]
             data = df_data.to_dict('records')
             df_columns = [{'name': i, 'id': i} for i in df_data.columns]
         except Exception as e:
@@ -128,7 +129,7 @@ def update_table(contents, filename):
 @app.callback(
     Output("download-cleaned-data", "data"),
     [Input("clean-data-button", "n_clicks"),
-     Input("intermediate-value", "data")],
+     Input("original-data-file", "data")],
     prevent_initial_call=True,
 )
 def clean_data(n_clicks, json_data):
@@ -136,7 +137,9 @@ def clean_data(n_clicks, json_data):
     if n_clicks != None:
         df_data = pd.read_json(json_data, orient='split')
         df_clean_data = glauben_data_prep.filterByGauss(df_data, n_desv_est=3)
-        dictionary = dcc.send_data_frame(df_clean_data.to_csv, "Datos-Limpios.csv")
+        df_clean_data_csv = df_clean_data.to_csv(index=False)
+        print("df_clean_data_csv:", df_clean_data_csv)
+        dictionary = dcc.send_data_frame(df_clean_data_csv, "Datos-Limpios.csv")
         return dictionary
     return
 
