@@ -14,6 +14,16 @@ class GlaubenDataPrep:
     self.data = pd.read_csv(self.data_dir)
     return
 
+  def generateSet(self, feature_names):
+    """
+      Función para obtener un pd.DataFrame con las columnas especificadas por parámetro.
+
+      Parámetros
+        - feature_names: Variable tipo String que posee las columnas deseadas del DataFrame
+    """
+    df_result = self.clean_data[feature_names]
+    return df_result
+
   def filterByGauss(self, df_data_orig: pd.DataFrame, n_desv_est: int):
     """
       Esta función ejecuta una limpieza de los datos de entrada mediante una distribución normal.
