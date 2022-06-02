@@ -184,3 +184,49 @@ class GlaubenDataVisualization:
                 'yanchor': 'top'})
         fig.show()
         return
+
+    def subPlots(self, y_name, type='scatter'):
+        """
+        Función para graficar multiples columnas al mismo tiempo, el tipo de gráfico será determinado por la variable type.
+        Se recomienda graficar 6 o menos gráficos.
+
+        Parámetros
+            - y_name: variable tipo lista, que contiene los valores de las columnas para graficar.
+            - type:   variable tipo String, que contiene el tipo de gráfico a utilizar.
+        """
+        size = len(y_name)/2
+        size = math.ceil(size)
+        fig_size_x = size*10
+        fig_size_y = size*4
+        if len(y_name) == 2:
+            size = 2
+            fig_size_x = 18
+            fig_size_y = 6
+        plt.figure(figsize=(fig_size_x, fig_size_y))
+        for i in range(len(y_name)):
+            curr_feature = y_name[i]
+            data = self.data[curr_feature]
+            x = np.arange(0, len(data))
+            plt.subplot(size, size, i+1)
+            if(type == 'scatter'):
+                plt.scatter(x, data, s=15, alpha=0.4,
+                            label=curr_feature, edgecolor='white',
+                            linewidths=0.25, c='C{}'.format(i))
+            elif(type == 'line'):
+                plt.plot(x, data, alpha=0.4,
+                            label=curr_feature, c='C{}'.format(i))
+            ax = plt.gca()
+            ax.set_axisbelow(True)
+            ax.grid(True, linestyle='-.', alpha=0.6)
+            ax.legend(loc='upper left')
+            ax.set_xlabel('Enumeración')
+            ax.set_ylabel(curr_feature)
+            ax.set_title(curr_feature)
+        fig = plt.gcf()
+        #filename = 'Scatter plots 4 variables post limpieza.png'
+        #filename = join(figures_dir, filename)
+        #fig.savefig(filename, format='png', bbox_inches="tight",
+        #            transparent=False, dpi=300)
+        plt.subplots_adjust(bottom=0.0, top=1.4)
+        plt.show()
+        return
