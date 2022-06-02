@@ -137,9 +137,9 @@ def clean_data(n_clicks, json_data):
     if n_clicks != None:
         df_data = pd.read_json(json_data, orient='split')
         df_clean_data = glauben_data_prep.filterByGauss(df_data, n_desv_est=3)
-        df_clean_data_csv = df_clean_data.to_csv(index=False)
-        print("df_clean_data_csv:", df_clean_data_csv)
-        dictionary = dcc.send_data_frame(df_clean_data_csv, "Datos-Limpios.csv")
+        #df_clean_data_csv = df_clean_data.to_csv(index=False)
+        #print("df_clean_data_csv:", df_clean_data_csv)
+        dictionary = dcc.send_data_frame(df_clean_data.to_csv, "Datos-Limpios.csv")
         return dictionary
     return
 
