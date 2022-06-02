@@ -9,7 +9,9 @@ import pandas as pd
 from sklearn import linear_model
 import multiprocessing as mp, time, ctypes, os
 import plotly.express as px
-
+import matplotlib.pyplot as plt
+import seaborn as sns
+ 
 from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
