@@ -1,5 +1,7 @@
 from re import X
 from sys import _xoptions
+
+from pkg_resources import safe_extra
 from src.import_modules import *
 
 
@@ -74,3 +76,17 @@ class GlaubenDataVisualization:
         ax.set_xticklabels(labels=x_labels, rotation=90, fontsize=13)
         plt.show()
         return
+    def matrizDeCorr(self, c_corr=[]):
+        if len(c_corr) == 0:
+            df_data = self.data
+        else:
+            df_data = self.data[c_corr]
+        corr = df_data.corr()
+        plt.figure(figsize=(15, 8))
+        sns.heatmap(corr, annot=True, fmt='.2f', cbar=False)
+        title = ('Correlaciones para datos')
+        plt.suptitle(title, fontsize=18)
+        
+        plt.show()
+            
+        
