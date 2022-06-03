@@ -2,23 +2,24 @@ from src.import_modules import *
 
 
 class GlaubenDataPrep:
+
     def __init__(self, data_dir):
         self.data_dir = data_dir  # C:/Users/ignac/downloads/test.csv
         # TODO: implementar algo con OS
         self.filename = data_dir.split('/')[-1]
         self.data = None
         self.clean_data = None
-    
+
     def splitTimestamp(self, timestamp):
         splitted_timestamp = timestamp.split(' ')
         return splitted_timestamp[0]
-        
+
     def addDayColum(self):
         data_cols = self.data.columns
         if ("Day" not in data_cols):
-          self.data['Day'] = self.data['Timestamp'].apply(self.splitTimestamp)
-        return  
-
+            self.data['Day'] = self.data['Timestamp'].apply(
+                self.splitTimestamp)
+        return
 
     def loadData(self):
         """
@@ -58,4 +59,9 @@ class GlaubenDataPrep:
             # La siguiente línea asegura que el dataset sea simétrico !
             delete_indexes = between_gauss[~between_gauss].index.values
             result_df = result_df.drop(delete_indexes, axis=0)
+        return result_df
+
+    def filterByIQR():
+        # TODO: implementar limpieza por rango IQR.
+        result_df = ''
         return result_df
