@@ -185,7 +185,6 @@ class GlaubenDataVisualization:
         fig.show()
         return
 
-<<<<<<< HEAD
     def mpltWithBox(self, x_name, y_name):
         df = self.data
         plt.figure(figsize=(30, 15))
@@ -212,7 +211,6 @@ class GlaubenDataVisualization:
         plt.suptitle(title, fontsize=18)
 
         plt.show()
-=======
     def subPlots(self, y_name, type='scatter'):
         """
         Función para graficar multiples columnas al mismo tiempo, el tipo de gráfico será determinado por la variable type.
@@ -258,4 +256,3 @@ class GlaubenDataVisualization:
         plt.subplots_adjust(bottom=0.0, top=1.4)
         plt.show()
         return
->>>>>>> 3320cd2fed33a34ee3b1998a39f82eae62f3d70e
