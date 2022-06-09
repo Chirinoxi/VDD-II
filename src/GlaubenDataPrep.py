@@ -4,12 +4,20 @@ from src.import_modules import *
 
 class GlaubenDataPrep:
 
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, feature='None'):
+        """
+            Constructor para asignar el objevo tipo pd.DataFrame y que característica se hara predicción (Para solo tomar las columnas necesarias para )
+
+            Parámetros
+            - mode: variable tipo string que determinará qué gráfico se desplegará (mpl o plotly)
+            - data: objeto de tipo pd.DataFrame que posee los datos
+        """
         self.data_dir = data_dir  # C:/Users/ignac/downloads/test.csv
         # TODO: implementar algo con OS
         self.filename = data_dir.split('/')[-1]
         self.data = None
         self.clean_data = None
+        self.feature = feature
 
     def splitTimestamp(self, timestamp):
         splitted_timestamp = timestamp.split(' ')
@@ -47,12 +55,12 @@ class GlaubenDataPrep:
         """
           Función destinada a cargar los datos almacenados en el directorio data_dir.
         """
-        try:
-            encodings = ['utf-8', 'latin']
-            for encode in encodings:
+        encodings = ['utf-8', 'latin']
+        for encode in encodings:
+            try:
                 self.data = pd.read_csv(self.data_dir, encoding=encode)
-        except Exception as e:
-            print("Exception:", e)
+            except Exception as e:
+                print("Exception:", e)
         return
 
     def dropNaNValues(self):
@@ -92,6 +100,8 @@ class GlaubenDataPrep:
             # result_df[col] = col_df[between_gauss]
             # La siguiente línea asegura que el dataset sea simétrico !
             delete_indexes = between_gauss[~between_gauss].index.values
+            print(len(delete_indexes))
+            print(col)
             result_df = result_df.drop(delete_indexes, axis=0)
         return result_df
 
@@ -133,3 +143,16 @@ class GlaubenDataPrep:
             delete_indexes = between_range[~between_range].index.values
             result_df = result_df.drop(delete_indexes, axis=0)
         return result_df
+
+    def generateSet(self, feature_names):
+        """
+            Función para obtener un pd.DataFrame con las columnas especificadas por parámetro.
+            Parámetros
+            - feature_names: Variable tipo String que posee las columnas deseadas del DataFrame
+        """
+        df_result = self.clean_data[feature_names]
+        return df_result
+
+    def desiredColumns(self, desiredColum):
+        self.data = self.data[desiredColum]
+        return 

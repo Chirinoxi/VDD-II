@@ -4,18 +4,20 @@ from src.import_modules import *
 
 
 class GlaubenDataVisualization:
-    """
-        Constructor para asignar el objevo tipo pd.DataFrame y qué gráfico se mostrará (mpl o plotly)
+    def __init__(self, mode, data, fig_dir='c:/Users/apa/Documents/Glauben ecology/Vertientes del desierto II/Figures'):
+        """
+            Constructor para asignar el objevo tipo pd.DataFrame y qué gráfico se mostrará (mpl o plotly)
 
-        Parámetros
-          - mode: variable tipo string que determinará qué gráfico se desplegará (mpl o plotly)
-          - data: objeto de tipo pd.DataFrame que posee los datos
-    """
-    def __init__(self, mode, data):
+            Parámetros
+            - mode: variable tipo string que determinará qué gráfico se desplegará (mpl o plotly)
+            - data: objeto de tipo pd.DataFrame que posee los datos
+            - fig_dir: variable tipo string que tendrá la dirección donde se guardarán las figuras
+        """
         self.mode = mode  # 'mpl' o 'plotly'
         self.data = data
+        self.fig_dir = fig_dir
 
-    def plotWithScatter(self, x_name, y_name, sep=1):
+    def plotWithScatter(self, x_name, y_name = [], sep=1, save = False, fig_name = 'figura_dispersion'):
         """
           Esta función crea un gráfico de plotly o mpl (especificado en el constructor) de dispersión (Scatter), 
           donde los datos del eje y pueden ser de un array, dataframe, etc. y múltiples de ellos.
@@ -28,6 +30,8 @@ class GlaubenDataVisualization:
         """
         if self.mode == "plotly":
             if type(y_name) == list:
+                if len(y_name) == 0:
+                    y_name = self.data.columns.tolist()
                 fig = px.scatter(self.data, x=x_name, y=y_name, width=1200, height=600, title=(
                     x_name + " vs " + str(', '.join(y_name))+"."))
             else:
@@ -47,12 +51,14 @@ class GlaubenDataVisualization:
             plt.figure(figsize=(12,6))
             ax, fig = plt.gca(), plt.gcf()
             if type(y_name) == list:
+                if len(y_name) == 0:
+                    y_name = self.data.columns.tolist()
                 for i in range(len(y_name)):
-                    fig = plt.scatter(x=self.data[x_name], y=self.data[y_name[i]], s=15, alpha=0.3,
+                    plt.scatter(x=self.data[x_name], y=self.data[y_name[i]], s=15, alpha=0.3,
                         label=y_name[i], edgecolor='white', c=('C'+str(i)))
                 ax.set_title(x_name + " vs " + str(', '.join(y_name)) +".")
             else:
-                fig = plt.scatter(x=self.data[x_name], y=self.data[y_name], s=15, alpha=0.3, c='C3',
+                plt.scatter(x=self.data[x_name], y=self.data[y_name], s=15, alpha=0.3, c='C3',
                     label=y_name, edgecolor='white')
                 ax.set_title(x_name + " vs " + y_name+".")
             ax.set_xlabel(x_name)
@@ -62,9 +68,13 @@ class GlaubenDataVisualization:
             ax.set_axisbelow(True)
             plt.xticks(rotation = 45)
             ax.legend(loc='lower right', bbox_to_anchor=(1.37, 0.0))
+            if save:
+                filename = (self.fig_dir + '/' + fig_name + '.png')
+                fig.savefig(filename, format='png', bbox_inches="tight",
+                            transparent=False, dpi=300)
         return
 
-    def plotWithBar(self, y_name=[]):
+    def plotWithBar(self, y_name=[], save = False, fig_name = 'figura_barra'):
         """
           Esta función crea un gráfico de plotly o mpl (especificado en el constructor) de barra (bar chart), 
           donde los datos del eje y pueden ser de un array, dataframe, etc. y múltiples de ellos.
@@ -74,7 +84,6 @@ class GlaubenDataVisualization:
                       en el caso dejar en blanco, se graficarán todas las columnas del dataframe.
 
         """
-
         if self.mode == "plotly":
             if type(y_name) == list:
                 if len(y_name) == 0:
@@ -96,7 +105,6 @@ class GlaubenDataVisualization:
                 cantidades = [cantidad]
                 fig = px.bar(x=nombres, y=cantidades, width=1200, height=600, title=(
                     "Cantidad no nulos de" + y_name+"."))
-
             if all_data:
                 fig.update_layout(title="Cantidad de datos no nulos por columna",
                                   title_x=0.5, width=1200, height=800, title_font={"size": 25})
@@ -156,6 +164,10 @@ class GlaubenDataVisualization:
                 ax.set_title('Cantidad de no nulos de '+y_name, fontsize=18)
                 ax.set_xlabel('Cantidad', fontsize=13)
                 ax.set_ylabel('Columna', fontsize=13)
+            if save:
+                filename = (self.fig_dir + '/' + fig_name + '.png')
+                fig.savefig(filename, format='png', bbox_inches="tight",
+                            transparent=False, dpi=300)
         return
 
     def plotWithLine(self, x_name, y_name, t_title):
@@ -211,7 +223,7 @@ class GlaubenDataVisualization:
         plt.suptitle(title, fontsize=18)
 
         plt.show()
-    def subPlots(self, y_name, type='scatter'):
+    def subPlots(self, y_name, type='scatter', save = False, fig_name = 'figura_subplots'):
         """
         Función para graficar multiples columnas al mismo tiempo, el tipo de gráfico será determinado por la variable type.
         Se recomienda graficar 6 o menos gráficos.
@@ -248,11 +260,16 @@ class GlaubenDataVisualization:
             ax.set_xlabel('Enumeración')
             ax.set_ylabel(curr_feature)
             ax.set_title(curr_feature)
-        fig = plt.gcf()
         #filename = 'Scatter plots 4 variables post limpieza.png'
         #filename = join(figures_dir, filename)
         #fig.savefig(filename, format='png', bbox_inches="tight",
         #            transparent=False, dpi=300)
         plt.subplots_adjust(bottom=0.0, top=1.4)
+        if save:
+            fig = plt.gcf()
+            filename = (self.fig_dir + '/' + fig_name + '.png')
+            fig.savefig(filename, format='png', bbox_inches="tight",
+                        transparent=False, dpi=300)
         plt.show()
         return
+
