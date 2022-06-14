@@ -2,16 +2,16 @@ from src.import_modules import *
 
 class GlaubenDataModeling:
 
-    def __init__(self, X: np.array, y: np.ndarray):
+    def __init__(self, data):
         """ Constructor de la clase GlaubenDataModeling.
 
             Parámetros:
-
-              - X: conjunto de características de entrada.
-              - y: conjunto que contiene la variable objetivo. 
+              - data: Lista de dataframes con los datos de cada planta para el modelado de datos.
         """
-        self.X = X
-        self.y = y
+        self.data = data
+
+        self.X
+        self.y
         self.X_normalized = None
         self.model = None
 
