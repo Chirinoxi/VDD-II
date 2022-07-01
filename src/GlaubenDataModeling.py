@@ -1,3 +1,4 @@
+from ast import Try
 from src.import_modules import *
 
 class GlaubenDataModeling:
@@ -29,9 +30,82 @@ class GlaubenDataModeling:
 
         self.X_train_orig = []
         self.y_train_orig = []
-    
+        #variables para experimento
+        self.nExp = None
+        self.modelName = None
+        self.learningRate = None
+        self.nEpochs = None
+        self.patience = None
+        self.cv = False
+
+    def selectExp(self):
+        """
+            Función para seleccionar los parámetros, hiperparámetros y número de experimento necesarios para realizar un entrenamiento del modelo
+
+            Variables a seleccionar
+                - nExp: Variable tipo int que contiene el número del experimento a realizar, para colocar en el nombre de los pesos.
+                - modelName: Variable tipo String que contiene el nombre del modelo a utilizar
+                - learningRate: Variable tipo float que contiene el learning rate a utilizar
+                - nEpochs: Variable tipo int que contiene la cantidad de épocas que el entrenamiento realizará
+                - patience: Variable tipo int que contiene la cantidad de paciencia que tendrá el modeo
+                - cv: Variable tipo boolean que contiene True en caso de realizar cross validation
+        """
+        while True:
+            try:
+                self.nExp = int(input('Ingrese el número del experimento: '))
+                break
+            except:
+                print("Error: Solo ingrese números.")
+        modelos = ['nn', 'lstm', 'kt-sdi', 'gru', 'srnn', 'cnn-lstm']
+        print("Seleccione el modelo para el experimento.")
+        for i in range(len(modelos)):
+            print("    "+str(i + 1)+") " + modelos[i])
+        while True:
+            try:
+                pos = int(input("Ingrese la opción: ")) - 1
+                self.modelName = modelos[pos]
+                if pos < len(modelos) and pos >= 0:
+                    break
+            except:
+                print("Error: Solo ingrese números de las opciones del menú.")
+        while True:
+            try:
+                self.nEpochs = int(input("Ingrese el número de épocas: "))
+                break
+            except:
+                print("Error: Ingrese solo números.")
+        while True:
+            try:
+                self.learningRate = float(input("Ingrese el learning rate: "))
+                break
+            except:
+                print("Error: Solo ingrese números")
+        while True:
+            try:
+                self.patience = int(input("Ingrese la paciencia: "))
+                break
+            except:
+                print("Error: Solo ingrese números")
+        while True:
+            cv = input("Desea utilizar cross validation (s/n): ")
+            if cv == "s":
+                self.cv = True
+                break
+            elif cv == "n":
+                self.cv = False
+                break
+            else:
+                print("Error: solo ingrese 's' o  'n'.")
+        return
 
     def createModel(self, mode_name, l_rate):
+        """
+            Función para crear el modelo para el entrenamiento
+
+            Parámetros
+                - mode_name: Variable tipo string que contiene el nombre del modelo a utilizar en el entrenamiento.
+                - l_rate: Variable tipo int que contiene el learning rate a utilziar en el entrenamiento.
+        """
         opt = Adam(learning_rate=l_rate) # Adagrad, Adadelta, Adamax, Adam, RMSprop, SGD, etc.
         mae  = tf.keras.losses.MeanAbsoluteError()
         rmse = tf.keras.metrics.RootMeanSquaredError()
@@ -117,6 +191,12 @@ class GlaubenDataModeling:
         return
 
     def normalizeData(self,normalization_name: str):
+        """
+            Función para normalizar la data para el entrenamiento
+
+            Parámetros
+                - normalization_name: Variable tipo string que contiene que tipo de normalización se deberá aplicar.
+        """
         # TODO: Implementar clausula if para crear los objetos Scaler,
         # dependiendo del valor de normalization_name y retornamos los datos normalizados.
         if normalization_name == 'standard':
@@ -134,6 +214,14 @@ class GlaubenDataModeling:
           Función que se encarga de entrenar nuestro modelo neuronal. Puede implementarse
           cross-validation con el parámetro cv.
 
+          Parámetros
+            - n_epochs: Variable tipo int que contiene el número de épocas que realizará el entrenamiento. 
+            - mode_name: Variable tipo String que contiene el nombre del modelo para el entrenamiento.
+            - b_size: Variable tipo int que contiene el batch size.
+            - learning_rate: Variable tipo int que contiene el learning rate.
+            - exp_number: Variable tipo int que contiene el número del experimento.
+            - patience: Variable tipo int que contiene la paciencia para el entrenamiento.
+            - optimizer_name: Variable tipo string que contiene el optimizador (generalmente Adam).
           Retorna:
             - model: tf.keras....
 
@@ -155,7 +243,7 @@ class GlaubenDataModeling:
 
         checkpoint_name = f"EXP #{exp_number}; model {mode_name.upper()}; variable {self.target_acronym}.hdf5"
         filepath = join('C:/Users/apa/Documents/Glauben ecology/Vertientes del desierto II/Modelos/Pesos', checkpoint_name)
-
+        print(filepath)
         our_callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_loss',
                             patience=patience, 
                             mode='min'),
@@ -233,10 +321,21 @@ class GlaubenDataModeling:
         return history
 
     def loadWeights(model_weights_dir):
+        """
+            Función para cargar los pesos guardados de un entrenamiento
+
+            Parámetros
+                - model_weigths_dir: Variable tipo String que contiene la dirección de los pesos a cargar.
+
+            Return
+        """
         # self.model.load_weights(model_weights_dir)
         return
 
     def selectData(self):
+        """
+            Función para seleccionar las columnas necesarias para el entrenamiento de los datos, en caso de ser SDI o FN, tendrá columas por defecto.
+        """
         if self.target_acronym == 'SDI':
             self.X = self.df_data[['Temperatura entrada', 'Flujo de Alimentacion',
                             'Presion de entrada', 'Conductividad de entrada']]
@@ -248,13 +347,32 @@ class GlaubenDataModeling:
         return
 
     def loadData(self):
+        """
+            Función para subir los datos a la variable correspondiente en pandas.
+        """
         self.df_data = pd.concat(self.data, ignore_index=True)
         return
     def saveModel(model_dir: str):
+        """
+            Función para guardar el modelo
+
+            Parámetros
+                - model_dir: Variable tipo String que contiene la dirección del modelo.
+        """
         # self.model.save(model_dir)
         return
 
     def splitData(self, X, y, k=4):
+        """
+            Función para separar los datos de forma repartida para el entramiento.
+
+            Parámetros
+                - X: Arreglo tipo Pandas que contiene los datos a separar.
+                - y: Arreglo tipo Pandas que contiene los datos a separar.
+
+            Return
+                Retorna 4 arreglos tipo pandas para el entrenamiento y test
+        """
         X_train = []
         X_test = []
         y_train = []
@@ -276,21 +394,25 @@ class GlaubenDataModeling:
 
         return (X_train, X_test, y_train, y_test)
 
-    def autoTrain(self, n_exp, n_epochs, learning_rate, patience, modelo, cv=False):
+    def autoTrain(self):
+        """
+            Función para realizar un entrenamiento simi automático, donde se deberán especificar los hiperparámetros y parámetros necesarios.
+        """
         self.loadData()
         self.selectData()
         K = 5
+        self.selectExp()
         if str(type(self.X)) == "<class 'numpy.ndarray'>":
             self.X_train, self.X_test, self.y_train, self.y_test = self.splitData(self.X, self.y, k=K)
         else:
             self.X_train, self.X_test, self.y_train, self.y_test = self.splitData(self.X.values, self.y.values, k=K)
-        if cv == False:
+        if self.cv == False:
             K = 4
             self.X_train, self.X_val, self.y_train, self.y_val = self.splitData(self.X_train, self.y_train, k=K)
         else:
             # Variables para llevar a cabo el proceso de cross-validation
             self.X_train_orig = self.X_train.copy()
             self.y_train_orig = self.y_train.copy()
-        self.history = self.trainModel(n_epochs = n_epochs, b_size=256,learning_rate=learning_rate, exp_number=n_exp, patience=patience, optimizer_name='adam', cv=cv, mode_name=modelo)
+        self.history = self.trainModel(n_epochs = self.nEpochs, b_size=256,learning_rate=self.learningRate, exp_number=self.nExp, patience=self.patience, optimizer_name='adam', cv=self.cv, mode_name=self.modelName)
         return
 
