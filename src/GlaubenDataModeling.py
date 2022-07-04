@@ -242,7 +242,7 @@ class GlaubenDataModeling:
                 self.X_val = self.X_val.reshape(-1, 4, 1)
 
         checkpoint_name = f"EXP #{exp_number}; model {mode_name.upper()}; variable {self.target_acronym}.hdf5"
-        filepath = join('C:/Users/apa/Documents/Glauben ecology/Vertientes del desierto II/Modelos/Pesos', checkpoint_name)
+        filepath = join('C:/Users/maiko/OneDrive/Documentos/Glauben ecology/Vertientes del desierto II/Modelos/Pesos', checkpoint_name)
         print(filepath)
         our_callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_loss',
                             patience=patience, 
@@ -320,7 +320,7 @@ class GlaubenDataModeling:
         # self.model.fit()
         return history
 
-    def loadWeights(model_weights_dir):
+    def loadWeights(self, model_weights_dir):
         """
             Función para cargar los pesos guardados de un entrenamiento
 
@@ -329,7 +329,7 @@ class GlaubenDataModeling:
 
             Return
         """
-        # self.model.load_weights(model_weights_dir)
+        self.model.load_weights(model_weights_dir)
         return
 
     def selectData(self):

@@ -274,3 +274,14 @@ class GlaubenDataPrep:
                 self.filterData(col = 'Flujo normalizado', limInf = 0, limSup=limSuperior)
         self.clean_data = self.filterByGauss(self.clean_data, 3)
         return
+
+    def downloadData(self, dir):
+        """
+            Función para descargar el archivo como csv, tendrá el mismo nombre que el archivo subido.
+            
+            Parámetros:
+                - dir: Variable tipo String que contiene la dirección a guardar el archivo
+        """
+        csvFilename = join(dir, self.filename)
+        self.clean_data.to_csv(csvFilename, index=False)
+        return
